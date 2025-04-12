@@ -98,7 +98,7 @@ const FindBooking = () => {
                         {!isDeleted && (
                             <button
                                 className='btn btn-danger'
-                                onClick={() => handleBookingCancellation(bookingInfo.id)}
+                                onClick={() => handleBookingCancellation(bookingInfo.bookingId)}
                             > Cancel Booking</button>
                         )}
                     </div>
