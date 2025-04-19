@@ -1,19 +1,22 @@
-import React from 'react'
-import { Col, Container, Row } from 'react-bootstrap';
+import React from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 
 const Footer = () => {
-    let today=new Date();
+  const today = new Date();
+
   return (
-    <footer className='bg-dark text-light py-3 footer mt-lg-5'>
-      <Container>
-        <Row>
-            <Col xs={12} md={12} className='text-center'>
-            <p>&copy;{today.getFullYear()}  lakeSide Hotel</p>
-            </Col>
+    <footer className="bg-dark text-light py-3 mt-auto">
+      <Container fluid>
+        <Row className="justify-content-center">
+          <Col xs="12" md="auto" className="text-center">
+            <p className="mb-0">
+              &copy; {today.getFullYear()} LakeSide Hotel. All rights reserved.
+            </p>
+          </Col>
         </Row>
       </Container>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;
