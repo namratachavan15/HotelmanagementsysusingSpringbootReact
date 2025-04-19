@@ -33,13 +33,7 @@ body {
  .navbar .navbar-nav .nav-item:hover::after{
   width: 100%;
  }
- .navbar-dark .navbar-nav .nav-link {
-  color: rgb(25, 24, 24);
-}
 
-.navbar-dark .navbar-brand {
-  color: rgb(25, 24, 24);
-}
 
  @media screen and (min-width: 992px){
   .navbar{
