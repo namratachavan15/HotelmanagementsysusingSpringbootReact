@@ -14,7 +14,10 @@ const NavBar = () => {
 	const userRole = localStorage.getItem("userRole")
 
 	return (
-		<nav className="navbar navbar-expand-lg bg-body-tertiary px-5 shadow mt-5 sticky-top">
+		<nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top top-0">
+
+
+
 			<div className="container-fluid">
 				<Link to={"/"} className="navbar-brand">
 					<span className="hotel-color">Taj Hotel</span>
