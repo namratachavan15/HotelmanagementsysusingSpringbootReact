@@ -23,6 +23,7 @@ const Login = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		const success = await loginUser(login)
+		console.log("data after login",success)
 		if (success) {
 			const token = success.token
 			auth.handleLogin(token)
@@ -37,8 +38,8 @@ const Login = () => {
 
 	return (
 		<section className="login-container">
-			<div className="login-card pt-0">
-				<h2 className="login-title">Login</h2>
+			<div className="login-card p-5">
+				<h2 className="login-title text-center mb-4 text-primary">Login</h2>
 				{errorMessage && <p className="alert alert-danger">{errorMessage}</p>}
 				<form onSubmit={handleSubmit}>
 					<div className="form-group">
@@ -65,9 +66,11 @@ const Login = () => {
 						/>
 					</div>
 
-					<button type="submit" className="btn btn-primary">
-						Login
-					</button>
+					<div className="d-grid">
+							<button type="submit" className="btn btn-primary">
+								Login
+							</button>
+						</div>
 					<div className="register-link">
 						Don't have an account yet? <Link to="/register">Register</Link>
 					</div>
