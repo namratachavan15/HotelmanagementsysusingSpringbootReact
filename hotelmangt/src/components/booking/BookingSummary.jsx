@@ -31,7 +31,7 @@ const BookingSummary = ({ booking, payment, isFormValid, onConfirm }) => {
   }, [isBookingConfirmed, navigate]);
 
   return (
-    <div className='card card-body mt-5'>
+    <div className='card card-body mt-5' style={{height:'486px'}}>
       <h4>Reservation Summary</h4>
       <p>FullName: <strong>{booking.guestFullName}</strong></p>
       <p>Email: <strong>{booking.guestEmail}</strong></p>
@@ -39,7 +39,7 @@ const BookingSummary = ({ booking, payment, isFormValid, onConfirm }) => {
       <p>Check-Out Date: <strong>{moment(booking.checkOutDate).format('MMM Do YYYY')}</strong></p>
       <p>Number of Days: <strong>{numberOfDays}</strong></p>
      
-      <div>
+      <div style={{marginBottom:'20px'}}>
         <h5>Number of Guests</h5>
         <strong>
         Adults{booking.numOfAdults > 1 ? 's' : ''}: {booking.numOfAdults}
@@ -52,12 +52,12 @@ const BookingSummary = ({ booking, payment, isFormValid, onConfirm }) => {
       {payment > 0 ? (
         <>
           <p>Total Payment: <strong>${payment}</strong></p>
-          console.log(isFormValid)
+         
           {
           
           
           isFormValid && !isBookingConfirmed ? (
-            <Button variant='success' onClick={handleConfirmBooking}>
+            <Button variant='success' onClick={handleConfirmBooking} style={{marginTop:"20px"}}>
               {isProcessingPayment ? (
                 <>
                   <span className='spinner-border spinner-border-sm mr-2' role='status' aria-hidden='true'></span>
