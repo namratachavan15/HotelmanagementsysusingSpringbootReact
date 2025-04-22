@@ -5,10 +5,10 @@ const Footer = () => {
   const today = new Date();
 
   return (
-    <footer className="bg-dark text-light py-3 mt-auto">
+    <footer className="bg-dark text-light py-3 ">
       <Container fluid>
         <Row className="justify-content-center">
-          <Col xs="12" md="auto" className="text-center">
+          <Col xs="12"  className="text-center">
             <p className="mb-0">
               &copy; {today.getFullYear()} LakeSide Hotel. All rights reserved.
             </p>
