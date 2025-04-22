@@ -91,9 +91,9 @@ const Registration = () => {
 						/>
 					</div>
 
-					<button type="submit" className="btn btn-primary">
-						Register
-					</button>
+					<div className="d-grid">
+							<button type="submit" className="btn btn-primary">Register</button>
+						</div>
 					<div className="login-link">
 						Already have an account? <Link to="/login">Login</Link>
 					</div>
