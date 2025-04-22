@@ -71,11 +71,11 @@ const AddRoom = () => {
   }
   return (
     <div>
-      <section className='container mt-5 mb-5'>
+      <section className='container  mb-5' style={{height:'530px'}}>
         <div className='row justify-content-center'>
           <div className='col-md-8 col-lg-6'>
 
-            <h2 className='mt-5 mb-2'>Add New Room</h2>
+            <h2 className='mt-2 mb-2'>Add New Room</h2>
             {
               successMessage &&(<div className='alert alert-success fade show'>{successMessage}</div>)
             }
@@ -105,7 +105,7 @@ const AddRoom = () => {
          {imagePreview && (
           <img src={imagePreview}
           alt="Preview Room Photo"
-          style={{maxWidth:"400px",maxHeight:"400px"}}
+          style={{maxWidth:"200px",maxHeight:"200px"}}
           className='mb-3'/>
          )}
          
