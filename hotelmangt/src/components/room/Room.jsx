@@ -49,7 +49,7 @@ const Room = () => {
     }
 
     return (
-        <Container>
+        <Container style={{height:"550px"}}>
           
             <Row>
                 <Col md={6} className="mb-3 mb-md-0">
