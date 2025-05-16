@@ -68,7 +68,7 @@ const FindBooking = () => {
   };
 
   return (
-    <div className="container" style={{marginTop:0,height:'600px'}}>
+    <div className="container" style={{marginTop:0,height:'620px'}}>
       <div className="row justify-content-center">
         <div className="col-12 col-sm-10 col-md-8 col-lg-6">
           <h2 className="text-center mb-2">Find My Booking</h2>
