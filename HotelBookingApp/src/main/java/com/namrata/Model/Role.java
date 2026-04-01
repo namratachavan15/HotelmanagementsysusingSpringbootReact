@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +30,7 @@ public class Role {
 	private String name;
 	
 	@ManyToMany(mappedBy = "roles")
+	@JsonIgnore  
 	private Collection<User> users=new HashSet<>();
 	
 	
