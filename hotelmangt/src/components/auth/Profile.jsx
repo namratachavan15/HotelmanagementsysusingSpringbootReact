@@ -31,6 +31,8 @@ const Profile = () => {
 	const userId = localStorage.getItem("userId")
 	const token = localStorage.getItem("token")
 
+	console.log("userid",userId)
+	console.log("token",token)
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
@@ -191,13 +193,7 @@ const Profile = () => {
 								<p>You have not made any bookings yet.</p>
 							)}
 
-							<div className="d-flex justify-content-center">
-								<div className="mx-2">
-									<button className="btn btn-danger btn-sm" onClick={handleDeleteAccount}>
-										Close account
-									</button>
-								</div>
-							</div>
+						
 						</div>
 					</div>
 				</div>
