@@ -19,6 +19,7 @@ import Registration from './components/auth/Registration';
 import Profile from './components/auth/Profile';
 import Logout from './components/auth/Logout';
 import {AuthProvider} from './components/auth/AuthProvider';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -31,7 +32,14 @@ function App() {
             <Route path="/edit-room/:roomId" element={<EditRoom/>}/>
             <Route path="/existing-room" element={<ExistingRooms/>}/>
              <Route path="/add-room" element={<AddRoom/>}/>
-             <Route path="/book-room/:roomId" element={<CheckOut/>}/>
+            <Route 
+  path="/book-room/:roomId" 
+  element={
+    <ProtectedRoute>
+      <CheckOut />
+    </ProtectedRoute>
+  } 
+/>
              <Route path="/browse-all-rooms" element={<RoomListing/>}/>
              <Route path="/admin" element={<Admin/>}/>
              <Route path="/booking-success" element={<BookingSuccess/>}></Route>
@@ -42,9 +50,11 @@ function App() {
              <Route path="/profile" element={<Profile/>}/>
              <Route path="/logout" element={<Logout/>}/>
           </Routes>
+         
         </Router>
-        <Footer/>
+       
       </main>
+      <Footer/>
    
     </AuthProvider>
   );
