@@ -13,6 +13,9 @@ const BookingForm = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [roomPrice, setRoomPrice] = useState(0);
     const currentUser = localStorage.getItem("userId")
+
+    const { user } = useAuth()
+
     const [booking, setBooking] = useState({
         guestFullName: "",
         guestEmail: "",
@@ -48,6 +51,18 @@ const BookingForm = () => {
     useEffect(() => {
         getRoomPriceById(roomId);
     }, [roomId]);
+    
+    
+
+useEffect(() => {
+    if (user) {
+        setBooking((prev) => ({
+            ...prev,
+           
+            guestEmail: user.sub
+        }));
+    }
+}, [user]);
 
     const calculatePayment = () => {
       
