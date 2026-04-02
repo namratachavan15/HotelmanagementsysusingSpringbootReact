@@ -71,7 +71,7 @@ const EditRoom = () => {
     }
   return (
     <div>
-     <section className='container mt-5 mb-5'>
+     <section className='container mt-1 mb-5'>
         <div className='row justify-content-center'>
         <div className='col-md-8 col-lg-6'>
         <h2 className='mt-5 mb-2'>Edit Room</h2>
@@ -100,7 +100,7 @@ const EditRoom = () => {
         {imagePreview && (
             <img src={imagePreview}
             alt="Preview Room Photo"
-            style={{maxWidth:"400px",maxHeight:"400px"}}
+            style={{maxWidth:"400px",maxHeight:"300px"}}
             className='mb-3'
             />
         )}
