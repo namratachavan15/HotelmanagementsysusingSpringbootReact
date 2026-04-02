@@ -5,7 +5,7 @@ const Footer = () => {
   const today = new Date();
 
   return (
-    <footer className="bg-dark text-light py-3 " style={{marginTop:'100px'}}>
+    <footer className="bg-dark text-light py-3 footer " >
       <Container fluid>
         <Row className="justify-content-center">
           <Col xs="12"  className="text-center">
