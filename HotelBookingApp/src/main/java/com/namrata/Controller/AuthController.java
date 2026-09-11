@@ -59,6 +59,14 @@ public class AuthController {
 		System.out.println("jwt=" + jwt);
 		HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-		return ResponseEntity.ok(new JwtResponse(userDetails.getId(), userDetails.getEmail(), jwt, roles));
+		return ResponseEntity.ok(
+		        new JwtResponse(
+		                userDetails.getId(),
+		                userDetails.getUsername(),
+		                userDetails.getEmail(),
+		                jwt,
+		                roles
+		        )
+		);
 	}
 }

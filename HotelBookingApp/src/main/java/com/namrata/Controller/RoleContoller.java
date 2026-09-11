@@ -52,7 +52,6 @@ public class RoleContoller {
 	public Role removeAllUsersFromRole(@PathVariable("roleId") Long roleId) {
 		return roleService.removeAllUsersFromRole(roleId);
 	}
-	
 
 	@PostMapping("/remove-user-from-role")
 	public User removeUserFromRole(@RequestParam("userId") Long userId, @RequestParam("roleId") Long roleId) {

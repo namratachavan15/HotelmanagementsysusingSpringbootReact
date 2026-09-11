@@ -1,9 +1,7 @@
-import React, { useEffect ,useState} from 'react'
-import { deleteUser, getBookingsByUserId, getUser,getUserProfile } from '../utils/ApiFunctions'
-import { useNavigate } from 'react-router-dom';
-
-import moment from "moment"
-
+import React, { useEffect, useState } from 'react'
+import { deleteUser, getUser } from '../utils/ApiFunctions'
+import { useNavigate, Link } from 'react-router-dom';
+import { FaClipboardList, FaArrowRight } from 'react-icons/fa'
 
 const Profile = () => {
 	const [user, setUser] = useState({
@@ -14,51 +12,28 @@ const Profile = () => {
 		roles: [{ id: "", name: "" }]
 	})
 
-	const [bookings, setBookings] = useState([
-		{
-			id: "",
-			room: { id: "", roomType: "" },
-			checkInDate: "",
-			checkOutDate: "",
-			bookingConfirmationCode: ""
-		}
-	])
-
 	const [message, setMessage] = useState("")
 	const [errorMessage, setErrorMessage] = useState("")
 	const navigate = useNavigate()
 
 	const userId = localStorage.getItem("userId")
+	const userEmail = localStorage.getItem("userEmail")
 	const token = localStorage.getItem("token")
 
-	console.log("userid",userId)
-	console.log("token",token)
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
-			
-				const userData = await getUser(userId, token)
+				const userData = await getUser(userEmail, token)
 				setUser(userData)
-				console.log("user"+userData)
 			} catch (error) {
 				console.error(error)
 			}
 		}
-		fetchUser()
-	}, [userId])
 
-	useEffect(() => {
-		const fetchBookings = async () => {
-			try {
-				const response = await getBookingsByUserId(userId, token)
-				setBookings(response)
-			} catch (error) {
-				console.error("Error fetching bookings:", error.message)
-				setErrorMessage(error.message)
-			}
+		if (userEmail) {
+			fetchUser()
 		}
-		fetchBookings()
-	}, [userId])
+	}, [userEmail, token])
 
 	const handleDeleteAccount = async () => {
 		const confirmed = window.confirm(
@@ -152,48 +127,33 @@ const Profile = () => {
 									</div>
 								</div>
 							</div>
+						</div>
 
-							<h4 className="card-title text-center">Booking History</h4>
+						{/* Booking history now lives on its own dedicated page (My
+						    Bookings) with filters, status badges, invoice download and
+						    cancellation - this card just links there instead of
+						    duplicating that table here. */}
+						<div className="col-md-10 mx-auto">
+							<div className="card mb-3 shadow p-4 d-flex flex-row align-items-center justify-content-between flex-wrap gap-3">
+								<div className="d-flex align-items-center gap-3">
+									<FaClipboardList size={28} className="hotel-color" />
+									<div>
+										<h5 className="mb-1">My Bookings</h5>
+										<p className="mb-0 text-muted">View, download invoices for, or cancel your reservations.</p>
+									</div>
+								</div>
+								<Link to="/my-bookings" className="btn btn-hotel d-flex align-items-center gap-2">
+									View my bookings <FaArrowRight size={12} />
+								</Link>
+							</div>
+						</div>
 
-							{bookings.length > 0 ? (
-								<table className="table table-bordered table-hover shadow">
-									<thead>
-										<tr>
-											
-											<th scope="col">Room ID</th>
-											<th scope="col">Room Type</th>
-											<th scope="col">Check In Date</th>
-											<th scope="col">Check Out Date</th>
-											<th scope="col">Confirmation Code</th>
-											<th scope="col">Status</th>
-										</tr>
-									</thead>
-									<tbody>
-										{bookings.map((booking, index) => (
-											<tr key={index}>
-												
-												
-												<td>{booking.room.id}</td>
-												<td>{booking.room.roomType}</td>
-												<td>
-													{moment(booking.checkInDate).subtract(1, "month").format("MMM Do, YYYY")}
-												</td>
-												<td>
-													{moment(booking.checkOutDate)
-														.subtract(1, "month")
-														.format("MMM Do, YYYY")}
-												</td>
-												<td>{booking.bookingConfirmationCode}</td>
-												<td className="text-success">On-going</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							) : (
-								<p>You have not made any bookings yet.</p>
-							)}
-
-						
+						<div className="d-flex justify-content-center">
+							<div className="mx-2">
+								<button className="btn btn-danger btn-sm" onClick={handleDeleteAccount}>
+									Close account
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>

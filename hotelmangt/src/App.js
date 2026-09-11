@@ -14,12 +14,13 @@ import BookingSuccess from './components/booking/BookingSuccess';
 import CheckOut from './components/booking/CheckOut';
 import Bookings from './components/booking/Bookings';
 import FindBooking from './components/booking/FindBooking';
+import MyBookings from './components/booking/MyBookings';
 import Login from './components/auth/Login';
 import Registration from './components/auth/Registration';
 import Profile from './components/auth/Profile';
 import Logout from './components/auth/Logout';
+import RequireAuth from './components/auth/RequireAuth';
 import {AuthProvider} from './components/auth/AuthProvider';
-import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -32,14 +33,7 @@ function App() {
             <Route path="/edit-room/:roomId" element={<EditRoom/>}/>
             <Route path="/existing-room" element={<ExistingRooms/>}/>
              <Route path="/add-room" element={<AddRoom/>}/>
-            <Route 
-  path="/book-room/:roomId" 
-  element={
-    <ProtectedRoute>
-      <CheckOut />
-    </ProtectedRoute>
-  } 
-/>
+             <Route path="/book-room/:roomId" element={<RequireAuth><CheckOut/></RequireAuth>}/>
              <Route path="/browse-all-rooms" element={<RoomListing/>}/>
              <Route path="/admin" element={<Admin/>}/>
              <Route path="/booking-success" element={<BookingSuccess/>}></Route>
@@ -47,14 +41,13 @@ function App() {
              <Route path="/find-booking" element={<FindBooking/>}/>
              <Route path="/login" element={<Login/>}/>
              <Route path="/register" element={<Registration/>}/>
-             <Route path="/profile" element={<Profile/>}/>
+             <Route path="/profile" element={<RequireAuth><Profile/></RequireAuth>}/>
+             <Route path="/my-bookings" element={<RequireAuth><MyBookings/></RequireAuth>}/>
              <Route path="/logout" element={<Logout/>}/>
           </Routes>
-         
+          <Footer/>
         </Router>
-       
       </main>
-      <Footer/>
    
     </AuthProvider>
   );

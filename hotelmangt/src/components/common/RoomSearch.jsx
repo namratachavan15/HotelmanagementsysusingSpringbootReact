@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import moment from "moment";
 import { getAvailableRooms } from '../utils/ApiFunctions';
 import {Container,Row,Col,Button,Form} from 'react-bootstrap'
+import { FaSearch } from 'react-icons/fa'
 
 import RoomTYpeSelector from './RoomTYpeSelector'
 import RoomSearchResult from './RoomSearchResult';
@@ -17,6 +18,7 @@ const RoomSearch = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [availableRooms, setAvailableRooms] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -35,10 +37,10 @@ const RoomSearch = () => {
         }
 
         setIsLoading(true);
+        setHasSearched(true);
 
         getAvailableRooms(searchQuery.checkInDate, searchQuery.checkOutDate, searchQuery.roomType)
             .then((response) => {
-                console.log(response.data)
                 setAvailableRooms(response.data);
             })
             .catch((error) => {
@@ -62,7 +64,7 @@ const RoomSearch = () => {
         if (checkIn.isValid() && checkOut.isValid()) {
             setErrorMessage("");
         }
-        
+
     };
 
     const clearSearch = () => {
@@ -71,14 +73,15 @@ const RoomSearch = () => {
             checkOutDate: "",
             roomType: ""
         });
-        setAvailableRooms([]); 
+        setAvailableRooms([]);
+        setHasSearched(false);
     };
 
     return (
-        <>
-            <Container className='mt-5 mb-5 py-5 shadow'>
+        <div className='search-widget-wrap'>
+            <Container className='search-widget'>
                 <Form onSubmit={handleSearch}>
-                    <Row className='justify-content-center'>
+                    <Row className='align-items-end g-3'>
                         <Col xs={12} md={3}>
                             <Form.Group controlId='checkInDate'>
                                 <Form.Label>Check-in date</Form.Label>
@@ -87,7 +90,6 @@ const RoomSearch = () => {
                                     name='checkInDate'
                                     value={searchQuery.checkInDate}
                                     onChange={handleInputChange}
-                                    // min={moment().format("YYYY-MM-DD")}
                                 />
                             </Form.Group>
                         </Col>
@@ -99,35 +101,34 @@ const RoomSearch = () => {
                                     name='checkOutDate'
                                     value={searchQuery.checkOutDate}
                                     onChange={handleInputChange}
-                                    // min={moment().format("YYYY-MM-DD")}
                                 />
                             </Form.Group>
                         </Col>
                         <Col xs={12} md={4}>
                             <Form.Group>
-                                <Form.Label>Room Type</Form.Label>
-                                <div className='d-flex'>
-                                    <RoomTYpeSelector handleRoomInputChange={handleInputChange} newRoom={searchQuery} />
-                                    <Button className="btn btn-sm btn-hotel" type='submit'>
-                                        Search
-                                    </Button>
-                                </div>
+                                <Form.Label>Room type</Form.Label>
+                                <RoomTYpeSelector handleRoomInputChange={handleInputChange} newRoom={searchQuery} />
                             </Form.Group>
+                        </Col>
+                        <Col xs={12} md={2}>
+                            <Button className="btn btn-hotel w-100 d-flex align-items-center justify-content-center gap-2" type='submit'>
+                                <FaSearch size={13}/> Search
+                            </Button>
                         </Col>
                     </Row>
                 </Form>
 
-                {isLoading ? (
-                    <p>Finding available Rooms....</p>
-                ) : availableRooms.length ? (
-                    <RoomSearchResult results={availableRooms} onClearSearch={clearSearch} />
-                ) : (
-                    <p>No rooms available for the selected dates and room type</p>
-                )}
+                {errorMessage && <p className='text-danger mt-3 mb-0'>{errorMessage}</p>}
 
-                {errorMessage && <p className='text-danger'>{errorMessage}</p>}
+                {isLoading ? (
+                    <p className='mt-4 mb-0 text-muted'>Finding available rooms…</p>
+                ) : hasSearched && availableRooms.length ? (
+                    <RoomSearchResult results={availableRooms} onClearSearch={clearSearch} />
+                ) : hasSearched ? (
+                    <p className='mt-4 mb-0 text-muted'>No rooms available for the selected dates and room type.</p>
+                ) : null}
             </Container>
-        </>
+        </div>
     );
 };
 

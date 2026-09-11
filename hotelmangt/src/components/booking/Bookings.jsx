@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { cancelBooking, getAllBookings } from '../utils/ApiFunctions'
-import Header from '../common/Header'
 import BookingTable from './BookingTable'
+import { FaClipboardList } from 'react-icons/fa'
 
 const Bookings = () => {
   const[bookingInfo,setBookingInfo]=useState([])
-
   const[isLoading,setIsLoading]=useState(true)
-
   const[error,setError]=useState("")
 
   useEffect(()=>{
@@ -16,12 +14,11 @@ const Bookings = () => {
       getAllBookings().then((data)=>{
         setBookingInfo(data)
         setIsLoading(false)
-
       }).catch((error)=>{
         setError(error.message)
         setIsLoading(false)
       })
-    },1000)
+    },500)
   },[])
 
   const handleBookingCancellation=async(bookingId)=>{
@@ -37,12 +34,16 @@ const Bookings = () => {
   }
 
   return (
-    <section className='container' style={{backgroundColor:"whitesmoke"}}>
-      <Header title="Existing Bookings"/>
-      {error && (<div className='text-danger'>{error}</div>)}
-      {isLoading ? (<div>
-        Loading Exisiting bookings
-      </div>):(
+    <section className='container page-section--tight'>
+      <div className='admin-hero d-flex align-items-center gap-3'>
+        <FaClipboardList size={30} style={{color:'#E4C766'}}/>
+        <div>
+          <h2 className='mb-1' style={{fontFamily:'var(--font-display)', color:'whitesmoke'}}>Existing bookings</h2>
+          <p className='mb-0' style={{color:'var(--color-text-muted)'}}>View, filter by date, and cancel reservations.</p>
+        </div>
+      </div>
+      {error && (<div className='alert alert-danger mt-3'>{error}</div>)}
+      {isLoading ? (<p className='text-muted mt-3'>Loading existing bookings…</p>):(
         <BookingTable  bookingInfo={bookingInfo} handleBookingCancellation={handleBookingCancellation}/>
       )}
     </section>

@@ -1,39 +1,140 @@
-import React, { createContext, useState, useContext } from "react"
 
-import jwtDecode from "jwt-decode"
+import React, { createContext, useState, useContext } from "react";
+import jwtDecode from "jwt-decode";
 
 export const AuthContext = createContext({
-	user: null,
-	handleLogin: (token) => {},
-	handleLogout: () => {}
-})
+    user: null,
+    username: null,
+    userRole: null,
+    isLoggedIn: false,
+    handleLogin: () => {},
+    handleLogout: () => {}
+});
+
+const getInitialUser = () => {
+    try {
+        const token = localStorage.getItem("token");
+
+        if (!token) return null;
+
+        return jwtDecode(token);
+    } catch (e) {
+        return null;
+    }
+};
+
+const getInitialRole = () => {
+    try {
+        const token = localStorage.getItem("token");
+
+        if (!token) return null;
+
+        const decodedUser = jwtDecode(token);
+
+        let role = decodedUser.roles;
+
+        if (Array.isArray(role)) {
+            role = role[0];
+        }
+
+        return role || null;
+    } catch (e) {
+        return null;
+    }
+};
+
+const getInitialUsername = () => {
+    return localStorage.getItem("username") || null;
+};
 
 export const AuthProvider = ({ children }) => {
-	const [user, setUser] = useState(null)
 
-	const handleLogin = (token) => {
-		const decodedUser = jwtDecode(token)
-		localStorage.setItem("userId", decodedUser.sub)
-		localStorage.setItem("userRole", decodedUser.roles)
-		localStorage.setItem("token", token)
-		setUser(decodedUser)
-	}
+    // Logged-in user
+    const [user, setUser] = useState(getInitialUser);
 
-	const handleLogout = () => {
-		localStorage.removeItem("userId")
-		localStorage.removeItem("userRole")
-		localStorage.removeItem("token")
-		setUser(null)
-	}
+    // Logged-in user's role
+    const [userRole, setUserRole] = useState(getInitialRole);
 
-	return (
-		<AuthContext.Provider value={{ user, handleLogin, handleLogout }}>
-			{children}
-		</AuthContext.Provider>
-	)
-}
+    // Logged-in user's username
+    const [username, setUsername] = useState(getInitialUsername);
+
+   
+
+const handleLogin = (token, loginResponse) => {
+    const decodedUser = jwtDecode(token);
+
+    console.log("AUTH LOGIN RESPONSE:", loginResponse);
+
+    const role =
+        loginResponse?.role ||
+        loginResponse?.roles?.[0] ||
+        null;
+
+    const loggedUsername =
+        loginResponse?.username ||
+        loginResponse?.fullName ||
+        loginResponse?.email ||
+        null;
+
+    console.log("AUTH USERNAME:", loggedUsername);
+    console.log("AUTH ROLE:", role);
+
+    localStorage.setItem(
+        "userId",
+        loginResponse?.id || decodedUser.sub
+    );
+
+    localStorage.setItem("userRole", role || "");
+    localStorage.setItem("token", token);
+
+    if (loginResponse?.email) {
+        localStorage.setItem("userEmail", loginResponse.email);
+    }
+
+    if (loggedUsername) {
+        localStorage.setItem("username", loggedUsername);
+    }
+
+    setUser(decodedUser);
+    setUserRole(role);
+    setUsername(loggedUsername);
+};
+
+
+
+
+
+    const handleLogout = () => {
+
+        // Clear localStorage
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+localStorage.removeItem("userEmail")
+        // Clear React state
+        setUser(null);
+        setUserRole(null);
+        setUsername(null);
+    };
+
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                username,
+                userRole,
+                isLoggedIn: !!user,
+                handleLogin,
+                handleLogout
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
+};
 
 export const useAuth = () => {
-	return useContext(AuthContext)
-}
+    return useContext(AuthContext);
+};
 

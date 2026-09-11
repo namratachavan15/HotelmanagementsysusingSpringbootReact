@@ -1,6 +1,7 @@
 import React, { useContext } from "react"
 import { AuthContext } from './AuthProvider'
 import { Link, useNavigate } from 'react-router-dom';
+import { FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
 
 const Logout = () => {
   
@@ -18,14 +19,19 @@ const Logout = () => {
         <>
         <li>
             <Link className="dropdown-item" to={"/profile"}>
-                Profile
+                <FaUser size={13}/> Profile
+            </Link>
+        </li>
+        <li>
+            <Link className="dropdown-item" to={"/my-bookings"}>
+                <FaClipboardList size={13}/> My Bookings
             </Link>
         </li>
         <li>
             <hr className="dropdown-divider" />
         </li>
         <button className="dropdown-item" onClick={handleLogout}>
-            Logout
+            <FaSignOutAlt size={13}/> Logout
         </button>
     </>
 )

@@ -30,6 +30,16 @@ private Long id;
 	
 	private List<BookingResponse> bookings;
 
+	// How many physical rooms of this type exist in inventory.
+	private int totalRooms;
+
+	// totalRooms minus however many are currently booked -- what the UI
+	// shows as "X rooms available" and what goes down after a booking.
+	private int availableRooms;
+
+	// How many of totalRooms are currently booked.
+	private int bookedRooms;
+
 	public RoomResponse(Long id, String roomType, BigDecimal roomPrice) {
 		super();
 		this.id = id;

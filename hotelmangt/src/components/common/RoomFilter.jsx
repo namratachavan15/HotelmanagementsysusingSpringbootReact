@@ -1,35 +1,7 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+import { FaFilter } from 'react-icons/fa'
 
-const RoomFilter = ({data,setFilteredData}) => {
-  //   const[filter,setFilter]=useState("")
-
-  //   const handleSelectChange=(e)=>{
-  //       const selectedRoomType=e.target.value
-  //       setFilter(selectedRoomType)
-  //       const filteredRooms=data.filter((room)=>room.roomType.toLowerCase().includes(selectedRoomType.toLowerCase()))
-  //       setFilteredData(filteredRooms)
-  //   }
-
-  //   const clearFilter=()=>{
-  //       setFilter("")
-  //       setFilteredData(data)
-  //   }
-
-  //   const roomTypes=["",...new Set(data.map((room)=>room.roomType))]
-
-  // return (
-  //   <div className='input-group mb-3'>
-  //     <span className='input-group-text' id="room-type-filter">Filter rooms by type</span>
-  //     <select className='form-select' value={filter} onChange={handleSelectChange}>
-  //       <option value={""}>select a room type to filter....</option>
-  //       {roomTypes.map((type,index)=>(
-  //           <option key={index} value={String(type)}>{String(type)}</option>
-  //       ))}
-  //       </select>  
-  //       <button className='btn btn-hotel' type='button' onClick={clearFilter}>Clear Filter</button>
-
-  //   </div>
-  // )
+const RoomFilter = ({data, setFilteredData}) => {
     const [filter, setFilter] = useState('');
     const [roomTypes, setRoomTypes] = useState([]);
 
@@ -57,15 +29,16 @@ const RoomFilter = ({data,setFilteredData}) => {
         setFilteredData(data);
     };
     return (
-        <div className='input-group mb-3'>
-            <span className='input-group-text' id="room-type-filter">Filter rooms by type</span>
-            <select className='form-select' value={filter} onChange={handleSelectChange}>
-                <option value={''}>Select a room type to filter...</option>
-                {roomTypes.map((type, index) => (
+        <div className='room-filter-bar'>
+            <FaFilter className='filter-icon' />
+            <span className='text-muted small'>Filter by type</span>
+            <select className='form-select' style={{maxWidth:'240px'}} value={filter} onChange={handleSelectChange}>
+                <option value={''}>All room types</option>
+                {roomTypes.filter(t => t !== '').map((type, index) => (
                     <option key={index} value={String(type)}>{String(type)}</option>
                 ))}
             </select>
-            <button className="btn btn-sm btn-hotel" type='button' onClick={clearFilter}>Clear Filter</button>
+            <button className="btn btn-hotel-outline btn-sm" type='button' onClick={clearFilter}>Clear</button>
         </div>
     );
 }

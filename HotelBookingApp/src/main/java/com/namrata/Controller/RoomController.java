@@ -51,12 +51,13 @@ public class RoomController {
 	@PostMapping("/add/new-room")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<RoomResponse> addNewRoom(@RequestParam("photo") MultipartFile photo,
-			@RequestParam("roomType") String roomType, @RequestParam("roomPrice") BigDecimal roomPrice) {
+			@RequestParam("roomType") String roomType, @RequestParam("roomPrice") BigDecimal roomPrice,
+			@RequestParam(value = "totalRooms", required = false, defaultValue = "1") Integer totalRooms) {
 		System.out.println("roomtype" + roomType);
-		Room savedRoom = roomService.addNewRoom(photo, roomType, roomPrice);
-		RoomResponse reponse = new RoomResponse(savedRoom.getId(), savedRoom.getRoomType(), savedRoom.getRoomPrice());
+		Room savedRoom = roomService.addNewRoom(photo, roomType, roomPrice, totalRooms);
+		RoomResponse reponse = getRoomResponse(savedRoom);
 
-		return ResponseEntity.ok(reponse);
+		return new ResponseEntity<>(reponse, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/room-types")
@@ -81,6 +82,31 @@ public class RoomController {
 		return ResponseEntity.ok(roomResponses);
 	}
 
+	// Same room list as /all-rooms, but bookedRooms/availableRooms are computed
+	// for the given check-in/check-out window instead of "as of today" -- this
+	// is what Browse Rooms calls once the guest has picked dates, so every
+	// card's availability is actually specific to those dates rather than a
+	// generic "today" snapshot.
+	@GetMapping("/all-rooms/availability")
+	public ResponseEntity<List<RoomResponse>> getAllRoomsAvailability(
+			@RequestParam("checkInDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
+			@RequestParam("checkOutDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate)
+			throws SQLException {
+		List<Room> rooms = roomService.getAllRooms();
+		List<RoomResponse> roomResponses = new ArrayList<>();
+
+		for (Room room : rooms) {
+			byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
+			if (photoBytes != null && photoBytes.length > 0) {
+				String base64Photo = Base64.encodeBase64String(photoBytes);
+				RoomResponse roomResponse = getRoomResponseForDateRange(room, checkInDate, checkOutDate);
+				roomResponse.setPhoto(base64Photo);
+				roomResponses.add(roomResponse);
+			}
+		}
+		return ResponseEntity.ok(roomResponses);
+	}
+
 	@DeleteMapping("/delete/room/{roomId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId) {
@@ -92,6 +118,7 @@ public class RoomController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long roomId,
 			@RequestParam(required = false) String roomType, @RequestParam(required = false) BigDecimal roomPrice,
+			@RequestParam(required = false) Integer totalRooms,
 			@RequestParam(required = false) MultipartFile photo) throws IOException, SQLException {
 
 		byte[] photoBytes = photo != null && !photo.isEmpty() ? photo.getBytes()
@@ -99,7 +126,7 @@ public class RoomController {
 
 		Blob photoBlob = photoBytes != null && photoBytes.length > 0 ? new SerialBlob(photoBytes) : null;
 
-		Room theRoom = roomService.updateRoom(roomId, roomType, roomPrice, photoBytes);
+		Room theRoom = roomService.updateRoom(roomId, roomType, roomPrice, totalRooms, photoBytes);
 		theRoom.setPhoto(photoBlob);
 		RoomResponse roomResponse = getRoomResponse(theRoom);
 		return ResponseEntity.ok(roomResponse);
@@ -121,13 +148,12 @@ public class RoomController {
 
 		List<BookedRoom> bookings = getAllBookingsByRoomId(room.getId());
 		List<BookingResponse> bookingsInfo = new ArrayList<>();
-
-		if (bookings != null) {
-			bookingsInfo = bookings.stream().map(booking -> new BookingResponse(booking.getBookingId(),
-					booking.getCheckInDate(), booking.getCheckOutDate(), booking.getBookingConfirmationCode()))
-					.toList();
-		}
-
+		
+		  if (bookings != null) { bookingsInfo = bookings.stream() .map(booking -> new
+		  BookingResponse(booking.getBookingId(), booking.getCheckInDate(),
+		  booking.getCheckOutDate(), booking.getBookingConfirmationCode())) .toList();
+		 }
+		 
 		byte[] photoBytes = null;
 		Blob photoBlob = room.getPhoto();
 		if (photoBlob != null) {
@@ -137,8 +163,34 @@ public class RoomController {
 				throw new PhotoRetrievalException("Error retrieving photo");
 			}
 		}
-		return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.isBooked(), photoBytes,
-				bookingsInfo);
+		RoomResponse roomResponse = new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(),
+				room.isBooked(), photoBytes, bookingsInfo);
+
+		int bookedCount = roomService.getBookedRoomCount(room.getId(), LocalDate.now());
+		int totalRooms = room.getTotalRooms();
+		roomResponse.setTotalRooms(totalRooms);
+		roomResponse.setBookedRooms(bookedCount);
+		roomResponse.setAvailableRooms(Math.max(totalRooms - bookedCount, 0));
+
+		return roomResponse;
+	}
+
+	// Same as getRoomResponse, but bookedRooms/availableRooms are computed for
+	// a specific check-in/check-out window instead of "as of today" -- this is
+	// what dated availability (search results, the booking form's live
+	// validation) must use, since "today's" snapshot does not reflect how many
+	// rooms are actually free for a future date range.
+	private RoomResponse getRoomResponseForDateRange(Room room, LocalDate checkInDate, LocalDate checkOutDate) {
+
+		RoomResponse roomResponse = getRoomResponse(room);
+
+		int bookedForRange = roomService.getBookedRoomCountForDateRange(room.getId(), checkInDate, checkOutDate);
+		int totalRooms = room.getTotalRooms();
+		roomResponse.setTotalRooms(totalRooms);
+		roomResponse.setBookedRooms(bookedForRange);
+		roomResponse.setAvailableRooms(Math.max(totalRooms - bookedForRange, 0));
+
+		return roomResponse;
 	}
 
 	@GetMapping("/available-rooms")
@@ -154,7 +206,10 @@ public class RoomController {
 			byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
 			if (photoBytes != null && photoBytes.length > 0) {
 				String photoBase64 = Base64.encodeBase64String(photoBytes);
-				RoomResponse roomResponse = getRoomResponse(room);
+				// Use the date-range-aware counts here -- these results are for a
+				// specific checkIn/checkOut window, so "available" must reflect
+				// bookings that overlap THOSE dates, not just "as of today".
+				RoomResponse roomResponse = getRoomResponseForDateRange(room, checkInDate, checkOutDate);
 				roomResponse.setPhoto(photoBase64);
 				roomResponses.add(roomResponse);
 			}
@@ -164,6 +219,20 @@ public class RoomController {
 		} else {
 			return ResponseEntity.ok(roomResponses);
 		}
+	}
+
+	// Lightweight endpoint for the booking form's live "X rooms available for
+	// your selected dates" check -- called whenever the guest changes the
+	// check-in/check-out dates or the room quantity, so it needs to be cheap
+	// and specific to one room, unlike /available-rooms which searches by type.
+	@GetMapping("/room/{roomId}/availability")
+	public ResponseEntity<RoomResponse> getRoomAvailability(@PathVariable Long roomId,
+			@RequestParam("checkInDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
+			@RequestParam("checkOutDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate) {
+
+		Room room = roomService.getRoomById(roomId).orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+		RoomResponse roomResponse = getRoomResponseForDateRange(room, checkInDate, checkOutDate);
+		return ResponseEntity.ok(roomResponse);
 	}
 
 	private List<BookedRoom> getAllBookingsByRoomId(Long roomId) {

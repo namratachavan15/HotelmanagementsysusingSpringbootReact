@@ -35,6 +35,11 @@ public class Room {
 
 	private boolean isBooked = false;
 
+	// How many physical rooms of this type the hotel actually has.
+	// This is the inventory count that availability/booking is checked against
+	// -- it is NOT a price multiplier.
+	private int totalRooms = 1;
+
 	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<BookedRoom> bookings;
 

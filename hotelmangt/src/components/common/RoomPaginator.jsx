@@ -6,9 +6,9 @@ const RoomPaginator = ({currentPage,totalPages,onPageChange}) => {
 
   return (
     <nav>
-    <ul className='pagination justify-content-center' style={{ listStyle: 'none' }}>
+    <ul className='pagination mb-0' style={{ listStyle: 'none' }}>
       {pageNumbers.map((pageNumber) => (
-        <li key={pageNumber} style={{ display: 'inline-block', margin: '0 5px' }} className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}>
+        <li key={pageNumber} style={{ display: 'inline-block', margin: '0 4px' }} className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}>
           <button className='btn btn-primary' onClick={() => onPageChange(pageNumber)}>
             {pageNumber}
           </button>

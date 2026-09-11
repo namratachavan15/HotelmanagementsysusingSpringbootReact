@@ -3,7 +3,7 @@ import {Row,Button} from 'react-bootstrap'
 import RoomCard from '../room/RoomCard'
 import RoomPaginator from './RoomPaginator'
 
-const RoomSearchResult = ({ results, onClearSearch }) => {
+const RoomSearchResult = ({ results, checkInDate, checkOutDate, onClearSearch }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const resultPerPage = 3;
   const totalResults = Array.isArray(results) ? results.length : 0;
@@ -21,14 +21,14 @@ const RoomSearchResult = ({ results, onClearSearch }) => {
     <>
       {results.length > 0 ? (
         <>
-          <h5 className="text-center mt-5">Search Result</h5>
-          <Row>
+          <h5 className="mt-5 mb-3">Search results</h5>
+          <Row className='g-4'>
             {paginatedResult.map((room) => (
-              <RoomCard key={room.id} room={room} />
+              <RoomCard key={room.id} room={room} checkInDate={checkInDate} checkOutDate={checkOutDate} />
             ))}
           </Row>
 
-          <Row>
+          <div className='d-flex flex-wrap align-items-center justify-content-between mt-3'>
             {totalResults > resultPerPage && (
               <RoomPaginator
                 currentPage={currentPage}
@@ -36,13 +36,13 @@ const RoomSearchResult = ({ results, onClearSearch }) => {
                 onPageChange={handlePageChange}
               />
             )}
-            <Button className="btn btn-sm btn-hotel" onClick={() => {
+            <Button className="btn btn-hotel-outline ms-auto" onClick={() => {
               onClearSearch();
-              setCurrentPage(1);  // Reset to the first page
+              setCurrentPage(1);
             }}>
-              Clear Search
+              Clear search
             </Button>
-          </Row>
+          </div>
         </>
       ) : (
         <p>No results found</p>
